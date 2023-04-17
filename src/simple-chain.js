@@ -5,36 +5,40 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 const chainMaker = {
-  chains : [1,"2",3],
-  showChains(){
-    console.log(this.chains)
+  chains: [],
+  show() {
+    console.log(this.chains);
   },
   getLength() {
-    console.log(this.chains.length)
-    return this.chains.length
+    return this.chains.length;
   },
   addLink(value) {
-    if(!value){
-      value = "";
+    if(typeof value === "number" && isNaN(value)){
+      this.chains.push('NaN');
+      return this
     }
-    this.chains = [...this.chains, value.toString()]
-  },
-  removeLink(position) {
-    if(position < 0 || position > this.chains.length){
-      throw new Error("You can't remove incorrect link!");
-    }
-    this.chains = this.chains.filter((el,index)=> index !== position - 1);
+
+    value ? this.chains.push(value.toString()) : this.chains.push(JSON.stringify(value));
+    return this
   },
   reverseChain() {
-    this.chains = this.chains.reverse()
+    this.chains.reverse();
+    return this
   },
-  finishChain() {
-    let newChain = this.chains.map((el) => {
-      return el = `( ${el} )~~`
-    }).join('').slice(0,-2);
-    return newChain
+  removeLink(position) {
+    if(!position || typeof position !== "number" || position < 0 || position > this.chains.length || !Number.isInteger(position)){
+      this.chains = [];
+      throw Error('You can\'t remove incorrect link!');
+    }
+    this.chains.splice((position - 1),1);
+    return this
+  },
+  finishChain(){
+    let copy = [...this.chains];
+    this.chains = [];
+    return copy.map(el => el = `( ${el} )~~`).join('').slice(0, -2);
   }
-};
+}
 
 module.exports = {
   chainMaker
